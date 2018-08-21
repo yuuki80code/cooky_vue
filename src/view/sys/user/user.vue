@@ -28,11 +28,16 @@
               <Input type="text" v-model="user.email" placeholder="邮箱" />
             </FormItem>
             <FormItem prop="sex" label="性别">
-              <RadioGroup v-model="user.sex">
+              <RadioGroup v-model="user.ssex">
                 <Radio label="0">男</Radio>
                 <Radio label="1">女</Radio>
                 <Radio label="2">保密</Radio>
               </RadioGroup>
+            </FormItem>
+            <FormItem prop="role" label="角色">
+              <Select v-model="user.roles" multiple>
+                <Option v-for="item in roleList" :value="item.roleId" :key="item.roleId">{{ item.roleName }}</Option>
+              </Select>
             </FormItem>
             <FormItem prop="status" label="状态">
               <i-switch v-model="user.status" size="large">
@@ -47,15 +52,12 @@
 </template>
 
 <script>
-  import Tables from '_c/tables'
-  import { getUserList } from '@/api/sys/user/user'
+  import { getUserList,addUser } from '@/api/sys/user/user'
   import { getAllDept } from '@/api/sys/dept/dept'
+  import { getRoleList } from '@/api/sys/role/role'
 
   export default {
     name: 'user',
-    components: {
-      Tables
-    },
     data () {
       return {
         curr: 1,
@@ -65,12 +67,14 @@
         user: {
           username: '',
           password: '',
-          dept: '',
+          deptId: '',
           email: '',
-          sex: '',
+          ssex: '',
+          roles: [],
           status: true
         },
         deptList: [],
+        roleList: [],
         columns: [
           {title: '用户名', key: 'username'},
           {title: '部门', key: 'deptName'},
@@ -128,11 +132,12 @@
         this.pageSize = pageSize
       },
       handleModalVisibleChange: function(flag) {
-        console.log(flag)
+
       },
       handleModalOk: function() {
-        console.log(this.$refs['tree'].getSelectedNodes())
+        this.user.deptId = this.$refs['tree'].getSelectedNodes()[0].id
         console.log(this.user)
+        addUser(this.user)
       },
       handleModalCancel: function() {
 
@@ -151,6 +156,9 @@
       getAllDept().then(res => {
         this.deptList = res.data
         console.log(res.data)
+      })
+      getRoleList().then(res => {
+        this.roleList = res.data
       })
     }
   }

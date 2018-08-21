@@ -13,3 +13,15 @@ export const getUserList = (name,page,pageSize) => {
     method: 'post'
   })
 }
+
+export const addUser = ( obj ) => {
+  const data = new URLSearchParams();
+  for(let key in obj){
+    data.append(key,obj[key])
+  }
+  return axios.request({
+    url: '/user/add',
+    data,
+    method: 'post'
+  })
+}
