@@ -7529,6 +7529,12 @@ vue-style-loader@^4.1.0:
     hash-sum "^1.0.2"
     loader-utils "^1.0.2"
 
+vue-table-with-tree-grid@^0.2.4:
+  version "0.2.4"
+  resolved "http://registry.npm.taobao.org/vue-table-with-tree-grid/download/vue-table-with-tree-grid-0.2.4.tgz#b60b22810ab861bdb669afb3d6f0079a4cee52a4"
+  dependencies:
+    vue "^2.4.3"
+
 vue-template-compiler@^2.5.13, vue-template-compiler@^2.5.16:
   version "2.5.17"
   resolved "http://registry.npm.taobao.org/vue-template-compiler/download/vue-template-compiler-2.5.17.tgz#52a4a078c327deb937482a509ae85c06f346c3cb"
@@ -7540,7 +7546,7 @@ vue-template-es2015-compiler@^1.6.0:
   version "1.6.0"
   resolved "http://registry.npm.taobao.org/vue-template-es2015-compiler/download/vue-template-es2015-compiler-1.6.0.tgz#dc42697133302ce3017524356a6c61b7b69b4a18"
 
-vue@^2.5.10, vue@^2.5.17:
+vue@^2.4.3, vue@^2.5.10, vue@^2.5.17:
   version "2.5.17"
   resolved "http://registry.npm.taobao.org/vue/download/vue-2.5.17.tgz#0f8789ad718be68ca1872629832ed533589c6ada"
 

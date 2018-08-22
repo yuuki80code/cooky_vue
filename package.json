@@ -5,10 +5,7 @@
   "private": false,
   "scripts": {
     "dev": "vue-cli-service serve --open --port 8086",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "test:unit": "vue-cli-service test:unit",
-    "test:e2e": "vue-cli-service test:e2e"
+    "build": "vue-cli-service build"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -26,6 +23,7 @@
     "vue": "^2.5.10",
     "vue-i18n": "^7.8.0",
     "vue-router": "^3.0.1",
+    "vue-table-with-tree-grid": "^0.2.4",
     "vuex": "^3.0.1",
     "wangeditor": "^3.1.1"
   },
@@ -48,18 +46,5 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ],
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.js": [
-      "vue-cli-service lint",
-      "git add"
-    ],
-    "*.vue": [
-      "vue-cli-service lint",
-      "git add"
-    ]
-  }
+  ]
 }

@@ -22,7 +22,7 @@
               <Input type="text" v-model="user.password" placeholder="密码" />
             </FormItem>
             <FormItem prop="dept" label="部门">
-              <Tree ref="tree" :data="deptList" :multiple="false" children-key="childs"></Tree>
+              <Tree ref="tree" :data="deptList" :multiple="false" children-key="children"></Tree>
             </FormItem>
             <FormItem prop="email" label="邮箱">
               <Input type="text" v-model="user.email" placeholder="邮箱" />
@@ -52,116 +52,116 @@
 </template>
 
 <script>
-  import { getUserList,addUser } from '@/api/sys/user/user'
-  import { getAllDept } from '@/api/sys/dept/dept'
-  import { getRoleList } from '@/api/sys/role/role'
+import { getUserList, addUser } from '@/api/sys/user/user'
+import { getAllDept } from '@/api/sys/dept/dept'
+import { getRoleList } from '@/api/sys/role/role'
 
-  export default {
-    name: 'user',
-    data () {
-      return {
-        curr: 1,
-        pageSize: 10,
-        modalTitle: '新增用户',
-        modalShow: false,
-        user: {
-          username: '',
-          password: '',
-          deptId: '',
-          email: '',
-          ssex: '',
-          roles: [],
-          status: true
-        },
-        deptList: [],
-        roleList: [],
-        columns: [
-          {title: '用户名', key: 'username'},
-          {title: '部门', key: 'deptName'},
-          {title: '邮箱', key: 'email'},
-          {title: '手机', key: 'mobile'},
-          {
-            title: '性别',
-            key: 'ssex',
-            render: (h,params) => {
-                return h('span',params.row.ssex==='1'? '男': params.row.ssex==='2' ? '女' : '保密')
-            }
-          },
-          {title: '创建时间', key: 'crateTime'},
-          {
-            title: '状态',
-            key: 'status',
-            render: (h,params) => {
-              return h('span',params.row.status==='0'? '锁定' : '正常')
-            }
-          },
-          {
-            title: '操作',
-            key: 'action',
-            render: (h,params) => {
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.show(params.index)
-                    }
-                  }
-                }, '编辑')
-              ])
-            }
+export default {
+  name: 'user',
+  data () {
+    return {
+      curr: 1,
+      pageSize: 10,
+      modalTitle: '新增用户',
+      modalShow: false,
+      user: {
+        username: '',
+        password: '',
+        deptId: '',
+        email: '',
+        ssex: '',
+        roles: [],
+        status: true
+      },
+      deptList: [],
+      roleList: [],
+      columns: [
+        {title: '用户名', key: 'username'},
+        {title: '部门', key: 'deptName'},
+        {title: '邮箱', key: 'email'},
+        {title: '手机', key: 'mobile'},
+        {
+          title: '性别',
+          key: 'ssex',
+          render: (h, params) => {
+            return h('span', params.row.ssex === '1' ? '男' : params.row.ssex === '2' ? '女' : '保密')
           }
-        ],
-        tableData: []
-      }
+        },
+        {title: '创建时间', key: 'crateTime'},
+        {
+          title: '状态',
+          key: 'status',
+          render: (h, params) => {
+            return h('span', params.row.status === '0' ? '锁定' : '正常')
+          }
+        },
+        {
+          title: '操作',
+          key: 'action',
+          render: (h, params) => {
+            return h('div', [
+              h('Button', {
+                props: {
+                  type: 'primary',
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.show(params.index)
+                  }
+                }
+              }, '编辑')
+            ])
+          }
+        }
+      ],
+      tableData: []
+    }
+  },
+  methods: {
+    handleDelete (params) {
+      console.log(params)
     },
-    methods: {
-      handleDelete (params) {
-        console.log(params)
-      },
-      onPageChange: function(curr) {
-        this.curr = curr
-      },
-      onPageSizeChange: function(pageSize) {
-        this.pageSize = pageSize
-      },
-      handleModalVisibleChange: function(flag) {
-
-      },
-      handleModalOk: function() {
-        this.user.deptId = this.$refs['tree'].getSelectedNodes()[0].id
-        console.log(this.user)
-        addUser(this.user)
-      },
-      handleModalCancel: function() {
-
-      },
-
-      exportExcel () {
-        this.$refs.tables.exportCsv({
-          filename: `table-${(new Date()).valueOf()}.csv`
-        })
-      }
+    onPageChange: function (curr) {
+      this.curr = curr
     },
-    mounted () {
-      getUserList(this.user.username,this.curr,this.pageSize).then(res => {
-        this.tableData = res.data.data
-      })
-      getAllDept().then(res => {
-        this.deptList = res.data
-        console.log(res.data)
-      })
-      getRoleList().then(res => {
-        this.roleList = res.data
+    onPageSizeChange: function (pageSize) {
+      this.pageSize = pageSize
+    },
+    handleModalVisibleChange: function (flag) {
+
+    },
+    handleModalOk: function () {
+      this.user.deptId = this.$refs['tree'].getSelectedNodes()[0].id
+      console.log(this.user)
+      addUser(this.user)
+    },
+    handleModalCancel: function () {
+
+    },
+
+    exportExcel () {
+      this.$refs.tables.exportCsv({
+        filename: `table-${(new Date()).valueOf()}.csv`
       })
     }
+  },
+  mounted () {
+    getUserList(this.user.username, this.curr, this.pageSize).then(res => {
+      this.tableData = res.data.data
+    })
+    getAllDept().then(res => {
+      this.deptList = res.data
+      console.log(res.data)
+    })
+    getRoleList().then(res => {
+      this.roleList = res.data
+    })
   }
+}
 </script>
 
 <style scoped>

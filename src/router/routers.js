@@ -78,6 +78,15 @@ export default [
           title: '角色管理'
         },
         component: () => import('@/view/join-page.vue')
+      },
+      {
+        path: 'sys_dept',
+        name: 'sys_dept',
+        meta: {
+          icon: '_md-settings',
+          title: '部门管理'
+        },
+        component: () => import('@/view/sys/dept')
       }
     ]
   },
