@@ -11,8 +11,7 @@
         v-model="modalShow"
         :mask-closable="false"
         @on-visible-change="handleModalVisibleChange"
-        @on-ok="handleModalOk"
-        @on-cancel="handleModalCancel">
+        @on-ok="handleModalOk">
         <div>
           <Form ref="userForm" :model="user" :label-width="80">
             <FormItem prop="username" label="用户名" required>
@@ -53,7 +52,7 @@
 
 <script>
 import { getUserList, addUser } from '@/api/sys/user/user'
-import { getAllDept } from '@/api/sys/dept/dept'
+import { getDeptTree } from '@/api/sys/dept/dept'
 import { getRoleList } from '@/api/sys/role/role'
 
 export default {
@@ -67,7 +66,7 @@ export default {
       user: {
         username: '',
         password: '',
-        deptId: '',
+        deptId: '0',
         email: '',
         ssex: '',
         roles: [],
@@ -135,12 +134,11 @@ export default {
 
     },
     handleModalOk: function () {
-      this.user.deptId = this.$refs['tree'].getSelectedNodes()[0].id
+      if(this.$refs['tree'].getSelectedNodes()[0]){
+        this.user.deptId = this.$refs['tree'].getSelectedNodes()[0].id
+      }
       console.log(this.user)
       addUser(this.user)
-    },
-    handleModalCancel: function () {
-
     },
 
     exportExcel () {
@@ -153,9 +151,8 @@ export default {
     getUserList(this.user.username, this.curr, this.pageSize).then(res => {
       this.tableData = res.data.data
     })
-    getAllDept().then(res => {
+    getDeptTree().then(res => {
       this.deptList = res.data
-      console.log(res.data)
     })
     getRoleList().then(res => {
       this.roleList = res.data
