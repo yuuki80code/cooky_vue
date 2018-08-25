@@ -2,9 +2,8 @@
     <div>
       <Card>
         <Button style="margin: 10px 0;" type="primary" @click="modalShow=true">新增用户</Button>
-        <!--<tables ref="tables" editable searchable search-place="top" v-model="tableData" :columns="columns" @on-delete="handleDelete"/>-->
         <Table border :columns="columns" :data="tableData"></Table>
-        <Page class="page" :total="100" :current="curr" :page-size="pageSize" show-sizer :on-change="onPageChange" :on-page-size-change="onPageSizeChange" />
+        <Page class="page" :total="total" :current="curr" :page-size="pageSize" show-sizer :on-change="onPageChange" :on-page-size-change="onPageSizeChange" />
       </Card>
       <Modal
         :title="modalTitle"
@@ -51,7 +50,7 @@
 </template>
 
 <script>
-import { getUserList, addUser } from '@/api/sys/user/user'
+import { getUserList, addUser,getUserWithRole } from '@/api/sys/user/user'
 import { getDeptTree } from '@/api/sys/dept/dept'
 import { getRoleList } from '@/api/sys/role/role'
 
@@ -61,9 +60,11 @@ export default {
     return {
       curr: 1,
       pageSize: 10,
+      total: 0,
       modalTitle: '新增用户',
       modalShow: false,
       user: {
+        userId: '',
         username: '',
         password: '',
         deptId: '0',
@@ -109,10 +110,31 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.show(params.index)
+                    getUserWithRole(params.row.userId).then(res=>{
+                      this.user = res.data
+                      this.user.status = this.user.status === '1'
+                      this.selectDept(this.deptList,this.user.deptId)
+                      console.log(this.deptList)
+                      this.modalShow = true
+                    })
+
                   }
                 }
-              }, '编辑')
+              }, '编辑'),
+              h('Button', {
+                props: {
+                  type: 'error',
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    console.log(params.row)
+                  }
+                }
+              }, '删除')
             ])
           }
         }
@@ -121,14 +143,13 @@ export default {
     }
   },
   methods: {
-    handleDelete (params) {
-      console.log(params)
-    },
     onPageChange: function (curr) {
       this.curr = curr
+      this._getUserList()
     },
     onPageSizeChange: function (pageSize) {
       this.pageSize = pageSize
+      this._getUserList()
     },
     handleModalVisibleChange: function (flag) {
 
@@ -140,7 +161,34 @@ export default {
       console.log(this.user)
       addUser(this.user)
     },
-
+    _getUserList: function () {
+      getUserList(this.user.username, this.curr, this.pageSize).then(res => {
+        this.tableData = res.data.data
+        this.total = res.data.total
+      })
+    },
+    selectDept: function (obj,id) {
+      // for(var child of obj)
+      //   if(child.id === id){
+      //     console.log(id)
+      //     if(child.children.length > 0){
+      //       console.log('sss')
+      //       child.expand = true
+      //     }
+      //     child.checked = true
+      //   }
+      //   if(child.children.length > 0){
+      //     this.selectDept(child.children,id)
+      //   }
+      let idStr = `"id":${id}`
+      let str = JSON.stringify(obj);
+      let index = str.indexOf(idStr);  /**找出idStr字符串的下标*/
+      let reg = new RegExp(idStr);
+      /**其后插入selected属性，选中该节点*/
+      let news = str.replace(reg, idStr + ',\"expand\": true,\"selected\":true');
+      console.log(news)
+      this.deptList = JSON.parse(news);
+    },
     exportExcel () {
       this.$refs.tables.exportCsv({
         filename: `table-${(new Date()).valueOf()}.csv`
@@ -148,9 +196,7 @@ export default {
     }
   },
   mounted () {
-    getUserList(this.user.username, this.curr, this.pageSize).then(res => {
-      this.tableData = res.data.data
-    })
+    this._getUserList()
     getDeptTree().then(res => {
       this.deptList = res.data
     })

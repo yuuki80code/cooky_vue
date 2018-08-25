@@ -20,7 +20,7 @@
         :selection-type="props.selectionType">
         <template slot="id" scope="scope">
           <Button type="primary" size="small">编辑</Button>&nbsp;&nbsp;
-          <Button type="warning" size="small">删除</Button>
+          <Button type="error" size="small">删除</Button>
         </template>
       </zk-table>
     </Card>
