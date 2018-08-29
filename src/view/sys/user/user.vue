@@ -6,7 +6,7 @@
         <Page class="page" :total="total" :current="curr" :page-size="pageSize" show-sizer :on-change="onPageChange" :on-page-size-change="onPageSizeChange" />
       </Card>
       <Modal
-        :title="modalTitle"
+        :title="addNew?'新增用户':'修改用户'"
         v-model="modalShow"
         :mask-closable="false"
         @on-visible-change="handleModalVisibleChange"
@@ -16,7 +16,7 @@
             <FormItem prop="username" label="用户名" required>
               <Input type="text" v-model="user.username" placeholder="用户名"/>
             </FormItem>
-            <FormItem prop="password" label="密码" required>
+            <FormItem prop="password" label="密码" required v-show="addNew">
               <Input type="text" v-model="user.password" placeholder="密码" />
             </FormItem>
             <FormItem prop="dept" label="部门">
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { getUserList, addUser,getUserWithRole } from '@/api/sys/user/user'
+import { getUserList, addUser,getUserWithRole,updateUser,deleteUser } from '@/api/sys/user/user'
 import { getDeptTree } from '@/api/sys/dept/dept'
 import { getRoleList } from '@/api/sys/role/role'
 
@@ -74,12 +74,12 @@ export default {
         status: true
       },
       deptList: [],
+      backUpDeptList: [],
       roleList: [],
       columns: [
         {title: '用户名', key: 'username'},
         {title: '部门', key: 'deptName'},
         {title: '邮箱', key: 'email'},
-        {title: '手机', key: 'mobile'},
         {
           title: '性别',
           key: 'ssex',
@@ -111,10 +111,11 @@ export default {
                 on: {
                   click: () => {
                     getUserWithRole(params.row.userId).then(res=>{
-                      this.user = res.data
+                      for(let key in this.user){
+                        this.user[key] = res.data[key]
+                      }
                       this.user.status = this.user.status === '1'
                       this.selectDept(this.deptList,this.user.deptId)
-                      console.log(this.deptList)
                       this.modalShow = true
                     })
 
@@ -131,7 +132,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    console.log(params.row)
+                    this.handleDelete(params.row.userId)
                   }
                 }
               }, '删除')
@@ -140,6 +141,11 @@ export default {
         }
       ],
       tableData: []
+    }
+  },
+  computed: {
+    addNew: function () {
+      return this.user.userId===''
     }
   },
   methods: {
@@ -152,14 +158,31 @@ export default {
       this._getUserList()
     },
     handleModalVisibleChange: function (flag) {
-
+      console.log(flag)
+      !flag?this.reset():null
     },
     handleModalOk: function () {
       if(this.$refs['tree'].getSelectedNodes()[0]){
         this.user.deptId = this.$refs['tree'].getSelectedNodes()[0].id
       }
       console.log(this.user)
-      addUser(this.user)
+      this.addNew?
+      addUser(this.user).then(res => {
+        this.$Message.success('添加成功')
+        this._getUserList()
+      })
+      :
+      updateUser(this.user).then(res => {
+
+        this.$Message.success('修改成功')
+        this._getUserList()
+      })
+    },
+    handleDelete: function (userId) {
+      deleteUser(userId).then(res=> {
+        this.$Message.success('删除成功')
+        this._getUserList()
+      })
     },
     _getUserList: function () {
       getUserList(this.user.username, this.curr, this.pageSize).then(res => {
@@ -168,26 +191,46 @@ export default {
       })
     },
     selectDept: function (obj,id) {
-      // for(var child of obj)
-      //   if(child.id === id){
-      //     console.log(id)
-      //     if(child.children.length > 0){
-      //       console.log('sss')
-      //       child.expand = true
-      //     }
-      //     child.checked = true
-      //   }
-      //   if(child.children.length > 0){
-      //     this.selectDept(child.children,id)
-      //   }
       let idStr = `"id":${id}`
-      let str = JSON.stringify(obj);
-      let index = str.indexOf(idStr);  /**找出idStr字符串的下标*/
-      let reg = new RegExp(idStr);
+      let pid = 0
+      obj.forEach(item=>{
+        if (item.children.length > 0){
+          if(item.id===id){
+            pid = item.parentId
+            return
+          }
+          item.children.forEach(child =>{
+            if(child.id===id){
+              pid = child.parentId
+              return
+            }
+          })
+        }
+      })
+
+      let str = JSON.stringify(obj)
+      let reg = new RegExp(idStr)
       /**其后插入selected属性，选中该节点*/
-      let news = str.replace(reg, idStr + ',\"expand\": true,\"selected\":true');
-      console.log(news)
+      let news = str.replace(reg, idStr + ',\"expand\": true,\"selected\":true')
+      if(pid !== 0){
+        let pidStr = `"id":${pid}`
+        reg = new RegExp(pidStr)
+        news = news.replace(reg, pidStr + ',\"expand\": true')
+      }
       this.deptList = JSON.parse(news);
+    },
+    reset: function() {
+      this.user = {
+        userId: '',
+          username: '',
+          password: '',
+          deptId: '0',
+          email: '',
+          ssex: '',
+          roles: [],
+          status: true
+        }
+      this.deptList = this.backUpDeptList
     },
     exportExcel () {
       this.$refs.tables.exportCsv({
@@ -199,6 +242,7 @@ export default {
     this._getUserList()
     getDeptTree().then(res => {
       this.deptList = res.data
+      this.backUpDeptList = res.data
     })
     getRoleList().then(res => {
       this.roleList = res.data

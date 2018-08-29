@@ -39,3 +39,26 @@ export const getUserWithRole = ( userId ) => {
     method: 'get'
   })
 }
+
+export const updateUser = ( user ) => {
+  const data = new URLSearchParams()
+  for(let key in user){
+    data.append(key,user[key])
+  }
+  console.log(data)
+  return axios.request({
+    url: '/user/update',
+    data,
+    method: 'post'
+  })
+}
+
+export const deleteUser = ( userId ) => {
+  const data = new URLSearchParams()
+  data.append('userId',userId)
+  return axios.request({
+    url: '/user/delete',
+    data,
+    method: 'post'
+  })
+}
