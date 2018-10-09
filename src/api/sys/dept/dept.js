@@ -14,13 +14,23 @@ export const getDeptTable = () => {
   })
 }
 
-export const addDept = (dept) => {
-  const data = new URLSearchParams();
+export const editDept = (dept) => {
+  const data = new URLSearchParams()
   for(let key in dept){
     data.append(key,dept[key])
   }
   return axios.request({
-    url: '/dept/add',
+    url: '/dept/edit',
+    data,
+    method: 'post'
+  })
+}
+
+export const deleteDept = id => {
+  const data = new URLSearchParams()
+  data.append("id",id)
+  return axios.request({
+    url: '/dept/delete',
     data,
     method: 'post'
   })

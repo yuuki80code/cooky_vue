@@ -1,11 +1,13 @@
 <template>
   <Layout style="height: 100%" class="main">
-    <Sider hide-trigger collapsible :width="256" :collapsed-width="64" v-model="collapsed">
+    <Sider hide-trigger collapsible :width="256" :collapsed-width="64" v-model="collapsed" :style="{background:'#fff'}">
       <side-menu accordion :active-name="$route.name" :collapsed="collapsed" @on-select="turnToPage" :menu-list="menuList">
         <!-- 需要放在菜单上面的内容，如Logo，写在side-menu标签内部，如下 -->
         <div class="logo-con">
-          <img v-show="!collapsed" :src="maxLogo" key="max-logo" />
-          <img v-show="collapsed" :src="minLogo" key="min-logo" />
+          <!--<img v-show="!collapsed" :src="maxLogo" key="max-logo" />-->
+          <!--<img v-show="collapsed" :src="minLogo" key="min-logo" />-->
+          <h1 v-show="!collapsed" >FEBS</h1>
+          <img v-show="collapsed" src="/sider.jpg" style="width: 50px; height: 50px; float:left; border-radius: 50%; border: 3px solid #eee; overflow: hidden;"></img>
         </div>
       </side-menu>
     </Sider>
@@ -13,8 +15,8 @@
       <Header class="header-con">
         <header-bar :collapsed="collapsed" @on-coll-change="handleCollapsedChange">
           <user :user-avator="userAvator"/>
-          <language @on-lang-change="setLocal" style="margin-right: 10px;" :lang="local"/>
-          <fullscreen v-model="isFullscreen" style="margin-right: 10px;"/>
+          <!--<language @on-lang-change="setLocal" style="margin-right: 10px;" :lang="local"/>-->
+          <!--<fullscreen v-model="isFullscreen" style="margin-right: 10px;"/>-->
         </header-bar>
       </Header>
       <Content>
@@ -132,3 +134,11 @@ export default {
   }
 }
 </script>
+<style>
+  .logo-con {
+    font-size: 23px;
+    text-align: center;
+    max-width: 256px;
+    color: #9AFF9A;
+  }
+</style>

@@ -77,7 +77,7 @@ export default [
           icon: '_md-settings',
           title: '角色管理'
         },
-        component: () => import('@/view/join-page.vue')
+        component: () => import('@/view/sys/role')
       },
       {
         path: 'sys_dept',
@@ -87,6 +87,15 @@ export default [
           title: '部门管理'
         },
         component: () => import('@/view/sys/dept')
+      },
+      {
+        path: 'sys_menu',
+        name: 'sys_menu',
+        meta: {
+          icon: '_md-settings',
+          title: '菜单管理'
+        },
+        component: () => import('@/view/sys/menu')
       }
     ]
   },

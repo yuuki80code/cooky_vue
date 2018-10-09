@@ -53,6 +53,7 @@
 import { getUserList, addUser,getUserWithRole,updateUser,deleteUser } from '@/api/sys/user/user'
 import { getDeptTree } from '@/api/sys/dept/dept'
 import { getRoleList } from '@/api/sys/role/role'
+import { selectDept} from "@/libs/tools";
 
 export default {
   name: 'user',
@@ -115,7 +116,7 @@ export default {
                         this.user[key] = res.data[key]
                       }
                       this.user.status = this.user.status === '1'
-                      this.selectDept(this.deptList,this.user.deptId)
+                      this.deptList = selectDept(this.deptList,this.user.deptId)
                       this.modalShow = true
                     })
 
@@ -190,35 +191,35 @@ export default {
         this.total = res.data.total
       })
     },
-    selectDept: function (obj,id) {
-      let idStr = `"id":${id}`
-      let pid = 0
-      obj.forEach(item=>{
-        if (item.children.length > 0){
-          if(item.id===id){
-            pid = item.parentId
-            return
-          }
-          item.children.forEach(child =>{
-            if(child.id===id){
-              pid = child.parentId
-              return
-            }
-          })
-        }
-      })
-
-      let str = JSON.stringify(obj)
-      let reg = new RegExp(idStr)
-      /**其后插入selected属性，选中该节点*/
-      let news = str.replace(reg, idStr + ',\"expand\": true,\"selected\":true')
-      if(pid !== 0){
-        let pidStr = `"id":${pid}`
-        reg = new RegExp(pidStr)
-        news = news.replace(reg, pidStr + ',\"expand\": true')
-      }
-      this.deptList = JSON.parse(news);
-    },
+    // selectDept: function (obj,id) {
+    //   let idStr = `"id":${id}`
+    //   let pid = 0
+    //   obj.forEach(item=>{
+    //     if (item.children.length > 0){
+    //       if(item.id===id){
+    //         pid = item.parentId
+    //         return
+    //       }
+    //       item.children.forEach(child =>{
+    //         if(child.id===id){
+    //           pid = child.parentId
+    //           return
+    //         }
+    //       })
+    //     }
+    //   })
+    //
+    //   let str = JSON.stringify(obj)
+    //   let reg = new RegExp(idStr)
+    //   /**其后插入selected属性，选中该节点*/
+    //   let news = str.replace(reg, idStr + ',\"expand\": true,\"selected\":true')
+    //   if(pid !== 0){
+    //     let pidStr = `"id":${pid}`
+    //     reg = new RegExp(pidStr)
+    //     news = news.replace(reg, pidStr + ',\"expand\": true')
+    //   }
+    //   this.deptList = JSON.parse(news);
+    // },
     reset: function() {
       this.user = {
         userId: '',
