@@ -20,7 +20,15 @@
         :selection-type="props.selectionType">
         <template slot="id" scope="scope">
           <Button type="primary" size="small" @click="handleEdit(scope.row)">编辑</Button>&nbsp;&nbsp;
-          <Button type="error" size="small" @click="handleDelete(scope.row)">删除</Button>
+          <Poptip v-show="scope.row.children.length !== 0"
+            confirm
+            :transfer = "true"
+            title="将连带子部门一并删除，确定删除？"
+            @on-ok="handleDelete(scope.row)"
+            >
+            <Button type="error" size="small">删除</Button>
+          </Poptip>
+          <Button type="error" size="small" @click="handleDelete(scope.row)" v-show="scope.row.children.length === 0">删除</Button>
         </template>
       </zk-table>
     </Card>
@@ -45,7 +53,8 @@
 
 <script>
 import { getDeptTree,deleteDept,editDept } from '@/api/sys/dept/dept'
-import { selectDept } from "@/libs/tools";
+import { buildTableTree,treeShow } from "@/libs/tools"
+import deepClone from 'clone-deep'
 
 export default {
   name: 'dept',
@@ -69,7 +78,7 @@ export default {
       deptTreeClone: [],
      // deptTable: [],
       deptForm: {
-        deptId: -1,
+        deptId: 0,
         deptName: '',
         parentId: '0',
       },
@@ -80,7 +89,7 @@ export default {
         },
         {
           label: '创建时间',
-          prop: 'extraData',
+          prop: 'createTime',
         },
         {
           label: '操作',
@@ -97,9 +106,9 @@ export default {
     },
     handleModalOk: function () {
       if(this.$refs['tree'].getSelectedNodes()[0]){
-        this.deptForm.parentId = this.$refs['tree'].getSelectedNodes()[0].id
+        this.deptForm.parentId = this.$refs['tree'].getSelectedNodes()[0].deptId
       }
-      console.log(this.deptForm)
+      //console.log(this.deptForm)
       editDept(this.deptForm).then(res => {
         this.$Message.success(res.msg)
         this._getDeptTree()
@@ -107,29 +116,31 @@ export default {
     },
     handleEdit: function(row) {
       //console.log(row)
-      this.deptTree = selectDept(this.deptTree,row.id)
-      this.deptForm.deptId = row.id
+
+      let temp = treeShow(this.deptTreeClone,'deptId',row.deptId,row.parentId)
+      this.deptTree = buildTableTree(temp,"deptId","deptName")
+      this.deptForm.deptId = row.deptId
       this.deptForm.deptName = row.title
       this.deptForm.parentId = row.parentId
       this.modalShow = true
     },
     handleDelete: function (row) {
-      deleteDept(row.id).then(res => {
+      deleteDept(row.deptId).then(res => {
         this.$Message.success(res.msg)
         this._getDeptTree()
       })
     },
     reset: function() {
       this.deptForm =  {
-        deptId: -1,
+        deptId: 0,
         deptName: '',
         parentId: '0',
       }
-      this.deptTree = this.deptTreeClone
+      this.deptTree = buildTableTree(this.deptTreeClone,'deptId','deptName')
     },
     _getDeptTree: function () {
       getDeptTree().then(res => {
-        this.deptTree = res.data
+        this.deptTree = buildTableTree(res.data,'deptId','deptName')
         this.deptTreeClone = res.data
       })
     }

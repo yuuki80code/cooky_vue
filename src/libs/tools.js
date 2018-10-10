@@ -209,6 +209,38 @@ export const buildTableTree = (list,idName,title) => {
   return handle(0)
 }
 /**
+ * 树的回显
+ * @param arr  扁平数据
+ * @param idName 标识key
+ * @param itemId  标识
+ * @param parentId  父类标识
+ */
+export const treeShow = (arr,idName,itemId,parentId,flag) => {
+  let temp = clonedeep(arr)
+  flag? parentId=itemId: ''
+  temp.forEach(item => {
+    if(item[idName] === parentId) {
+      item.selected = true
+    }
+    if(item[idName] === itemId) {
+      item.disabled = true
+    }
+  })
+  const handle = id => {
+    temp.forEach(item => {
+      if(item[idName] === id) {
+        if(item.parentId!==0) {
+          item.expand = true
+          handle(item.parentId)
+        }else
+          item.expand = true
+      }
+    })
+  }
+  handle(parentId)
+  return temp
+}
+/**
  * tree的回显
  * @param obj
  * @param id

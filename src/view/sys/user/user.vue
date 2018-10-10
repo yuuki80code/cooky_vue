@@ -20,7 +20,7 @@
               <Input type="text" v-model="user.password" placeholder="密码" />
             </FormItem>
             <FormItem prop="dept" label="部门">
-              <Tree ref="tree" :data="deptList" :multiple="false" children-key="children"></Tree>
+              <Tree ref="tree" :data="deptTree" :multiple="false" children-key="children"></Tree>
             </FormItem>
             <FormItem prop="email" label="邮箱">
               <Input type="text" v-model="user.email" placeholder="邮箱" />
@@ -53,7 +53,7 @@
 import { getUserList, addUser,getUserWithRole,updateUser,deleteUser } from '@/api/sys/user/user'
 import { getDeptTree } from '@/api/sys/dept/dept'
 import { getRoleList } from '@/api/sys/role/role'
-import { selectDept} from "@/libs/tools";
+import { buildTableTree,treeShow } from "@/libs/tools"
 
 export default {
   name: 'user',
@@ -74,7 +74,7 @@ export default {
         roles: [],
         status: true
       },
-      deptList: [],
+      deptTree: [],
       backUpDeptList: [],
       roleList: [],
       columns: [
@@ -85,7 +85,7 @@ export default {
           title: '性别',
           key: 'ssex',
           render: (h, params) => {
-            return h('span', params.row.ssex === '1' ? '男' : params.row.ssex === '2' ? '女' : '保密')
+            return h('span', params.row.ssex === '0' ? '男' : params.row.ssex === '1' ? '女' : '保密')
           }
         },
         {title: '创建时间', key: 'crateTime'},
@@ -111,15 +111,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    getUserWithRole(params.row.userId).then(res=>{
-                      for(let key in this.user){
-                        this.user[key] = res.data[key]
-                      }
-                      this.user.status = this.user.status === '1'
-                      this.deptList = selectDept(this.deptList,this.user.deptId)
-                      this.modalShow = true
-                    })
-
+                    this.handleEdit(params.row)
                   }
                 }
               }, '编辑'),
@@ -159,14 +151,14 @@ export default {
       this._getUserList()
     },
     handleModalVisibleChange: function (flag) {
-      console.log(flag)
+      //console.log(flag)
       !flag?this.reset():null
     },
     handleModalOk: function () {
       if(this.$refs['tree'].getSelectedNodes()[0]){
-        this.user.deptId = this.$refs['tree'].getSelectedNodes()[0].id
+        this.user.deptId = this.$refs['tree'].getSelectedNodes()[0].deptId
       }
-      console.log(this.user)
+      //console.log(this.user)
       this.addNew?
       addUser(this.user).then(res => {
         this.$Message.success('添加成功')
@@ -178,6 +170,18 @@ export default {
         this.$Message.success('修改成功')
         this._getUserList()
       })
+    },
+    handleEdit: function(row) {
+      getUserWithRole(row.userId).then(res=>{
+        for(let key in this.user){
+          this.user[key] = res.data[key]
+        }
+        this.user.status = this.user.status === '1'
+        this.deptTree = buildTableTree(treeShow(this.backUpDeptList,'deptId',this.user.deptId,this.getDeptParentId(this.user.deptId),true),'deptId','deptName')
+        //this.deptTree = selectDept(this.deptTree,this.user.deptId)
+        this.modalShow = true
+      })
+
     },
     handleDelete: function (userId) {
       deleteUser(userId).then(res=> {
@@ -191,35 +195,11 @@ export default {
         this.total = res.data.total
       })
     },
-    // selectDept: function (obj,id) {
-    //   let idStr = `"id":${id}`
-    //   let pid = 0
-    //   obj.forEach(item=>{
-    //     if (item.children.length > 0){
-    //       if(item.id===id){
-    //         pid = item.parentId
-    //         return
-    //       }
-    //       item.children.forEach(child =>{
-    //         if(child.id===id){
-    //           pid = child.parentId
-    //           return
-    //         }
-    //       })
-    //     }
-    //   })
-    //
-    //   let str = JSON.stringify(obj)
-    //   let reg = new RegExp(idStr)
-    //   /**其后插入selected属性，选中该节点*/
-    //   let news = str.replace(reg, idStr + ',\"expand\": true,\"selected\":true')
-    //   if(pid !== 0){
-    //     let pidStr = `"id":${pid}`
-    //     reg = new RegExp(pidStr)
-    //     news = news.replace(reg, pidStr + ',\"expand\": true')
-    //   }
-    //   this.deptList = JSON.parse(news);
-    // },
+    getDeptParentId: function(id) {
+      return this.backUpDeptList.filter(item => {
+        return item.deptId === id
+      })[0].parentId
+    },
     reset: function() {
       this.user = {
         userId: '',
@@ -231,18 +211,13 @@ export default {
           roles: [],
           status: true
         }
-      this.deptList = this.backUpDeptList
+      this.deptTree = buildTableTree(this.backUpDeptList,"deptId","deptName")
     },
-    exportExcel () {
-      this.$refs.tables.exportCsv({
-        filename: `table-${(new Date()).valueOf()}.csv`
-      })
-    }
   },
   mounted () {
     this._getUserList()
     getDeptTree().then(res => {
-      this.deptList = res.data
+      this.deptTree = buildTableTree(res.data,"deptId","deptName")
       this.backUpDeptList = res.data
     })
     getRoleList().then(res => {

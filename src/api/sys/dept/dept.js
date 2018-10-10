@@ -2,17 +2,17 @@ import axios from '@/libs/api.request'
 
 export const getDeptTree = () => {
   return axios.request({
-    url: '/dept/tree',
+    url: '/dept/list',
     method: 'get'
   })
 }
 
-export const getDeptTable = () => {
-  return axios.request({
-    url: '/dept/treetable',
-    method: 'get'
-  })
-}
+// export const getDeptTable = () => {
+//   return axios.request({
+//     url: '/dept/treetable',
+//     method: 'get'
+//   })
+// }
 
 export const editDept = (dept) => {
   const data = new URLSearchParams()

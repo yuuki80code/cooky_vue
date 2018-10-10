@@ -23,7 +23,15 @@
           </template>
           <template slot="id" scope="scope">
             <Button type="primary" size="small" @click="handleEdit(scope.row)">编辑</Button>&nbsp;&nbsp;
-            <Button type="error" size="small" @click="handleDelete(scope.row)">删除</Button>
+            <Poptip v-show="scope.row.children.length !== 0"
+                    confirm
+                    :transfer = "true"
+                    title="子菜单将升级成一级菜单，确定删除？"
+                    @on-ok="handleDelete(scope.row)"
+            >
+              <Button type="error" size="small">删除</Button>
+            </Poptip>
+            <Button type="error" size="small" @click="handleDelete(scope.row)" v-show="scope.row.children.length === 0">删除</Button>
           </template>
         </zk-table>
       </Card>
@@ -47,7 +55,7 @@
             <Input type="text" v-model="menuForm.url" placeholder="菜单URL"/>
           </FormItem>
           <FormItem prop="perms" label="权限描述">
-            <Input type="text" v-model="menuForm.menuIds" placeholder="权限描述"/>
+            <Input type="text" v-model="menuForm.perms" placeholder="权限描述"/>
           </FormItem>
           <FormItem prop="parenId" label="上级菜单">
             <Tree ref="tree" :data="menuTree" :multiple="false" children-key="children"></Tree>
@@ -58,8 +66,8 @@
 </template>
 
 <script>
-  import { getMenu,editMenu,deleteMenu } from "@/api/sys/menu/menu";
-  import { buildTableTree } from "@/libs/tools";
+  import { getMenu,editMenu,deleteMenu } from "@/api/sys/menu/menu"
+  import { buildTableTree,treeShow } from "@/libs/tools"
 
   export default {
       name: "imenu",
@@ -84,9 +92,9 @@
             menuName: '',
             type: '0',
             url: '',
-            menuIds: '',
+            perms: '',
             icon: '',
-            parentId: 0,
+            parentId: '0',
           },
           menuTree: [],
           menuData: [],
@@ -107,7 +115,7 @@
             },
             {
               label: '权限标识',
-              prop: 'menuIds',
+              prop: 'perms',
             },
             {
               label: '创建时间',
@@ -135,11 +143,12 @@
           let menus = this.menuData.filter(item => {
             return item.menuId === row.menuId
           })
-          console.log(menus)
           this.menuForm = menus[0]
           delete this.menuForm.createTime
           delete this.menuForm.modifyTime
           delete this.menuForm.icon
+          let temp = treeShow(this.menuData,'menuId',row.menuId,row.parentId)
+          this.menuTree = buildTableTree(temp,'menuId','menuName')
           this.modalShow = true
         },
         handleDelete: function (row) {
@@ -161,7 +170,7 @@
           //this.reset()
         },
         handleModalVisibleChange: function (event) {
-
+          event?'':this.reset()
         },
         reset: function () {
           this.menuForm = {
@@ -169,10 +178,11 @@
             menuName: '',
             type: '0',
             url: '',
-            menuIds: '',
+            perms: '',
             icon: '',
-            parentId: 0,
+            parentId: "0",
           }
+          this.menuTree = buildTableTree(this.menuData,'menuId','menuName')
         }
       },
       mounted() {
