@@ -1,16 +1,17 @@
-import Cookies from 'js-cookie'
+//import Cookies from 'js-cookie'
 // cookie保存的天数
-import config from '@/config'
+//import config from '@/config'
 import { forEach, hasOneOf } from '@/libs/tools'
 
-export const TOKEN_KEY = 'token'
+export const TOKEN_KEY = 'Authorization'
 
 export const setToken = (token) => {
-  Cookies.set(TOKEN_KEY, token, {expires: config.cookieExpires || 1})
+  //Cookies.set(TOKEN_KEY, token, {expires: config.cookieExpires || 1})
+  sessionStorage.setItem(TOKEN_KEY,token)
 }
 
 export const getToken = () => {
-  const token = Cookies.get(TOKEN_KEY)
+  const token = sessionStorage.getItem(TOKEN_KEY)//Cookies.get(TOKEN_KEY)
   if (token) return token
   else return false
 }
@@ -123,8 +124,9 @@ export const getNewTagList = (list, newRoute) => {
  * @param {*} route 路由列表
  */
 const hasAccess = (access, route) => {
-  if (route.meta && route.meta.access) return hasOneOf(access, route.meta.access)
-  else return true
+  // if (route.meta && route.meta.access) return hasOneOf(access, route.meta.access)
+  // else return true
+  return true
 }
 
 /**
@@ -145,7 +147,7 @@ export const canTurnTo = (name, access, routes) => {
     })
   }
 
-  return routePermissionJudge(routes)
+  return true//routePermissionJudge(routes)
 }
 
 /**

@@ -190,6 +190,7 @@ export const off = (function () {
 })()
 
 export const buildTableTree = (list,idName,title) => {
+  if(!list) return []
   if(!list.length) return []
   const listClone = clonedeep(list)
   const handle = id => {

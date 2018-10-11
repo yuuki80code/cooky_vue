@@ -14,9 +14,7 @@
     <Layout>
       <Header class="header-con">
         <header-bar :collapsed="collapsed" @on-coll-change="handleCollapsedChange">
-          <user :user-avator="userAvator"/>
-          <!--<language @on-lang-change="setLocal" style="margin-right: 10px;" :lang="local"/>-->
-          <!--<fullscreen v-model="isFullscreen" style="margin-right: 10px;"/>-->
+          <user user-avator="/sider.jpg"/>
         </header-bar>
       </Header>
       <Content>
@@ -39,28 +37,20 @@ import SideMenu from './components/side-menu'
 import HeaderBar from './components/header-bar'
 import TagsNav from './components/tags-nav'
 import User from './components/user'
-import Fullscreen from './components/fullscreen'
-import Language from './components/language'
 import { mapMutations, mapActions } from 'vuex'
 import { getNewTagList, getNextName } from '@/libs/util'
-import minLogo from '@/assets/images/logo-min.jpg'
-import maxLogo from '@/assets/images/logo.jpg'
 import './main.less'
 export default {
   name: 'Main',
   components: {
     SideMenu,
     HeaderBar,
-    Language,
     TagsNav,
-    Fullscreen,
     User
   },
   data () {
     return {
       collapsed: false,
-      minLogo,
-      maxLogo,
       isFullscreen: false
     }
   },
@@ -71,34 +61,30 @@ export default {
     tagRouter () {
       return this.$store.state.app.tagRouter
     },
-    userAvator () {
-      return this.$store.state.user.avatorImgPath
-    },
+    // userAvator () {
+    //   return this.$store.state.login.avatorImgPath
+    // },
     cacheList () {
       return this.tagNavList.length ? this.tagNavList.filter(item => !(item.meta && item.meta.notCache)).map(item => item.name) : []
     },
     menuList () {
       return this.$store.getters.menuList
     },
-    local () {
-      return this.$store.state.app.local
-    }
+    // local () {
+    //   return this.$store.state.app.local
+    // }
   },
   methods: {
     ...mapMutations([
       'setBreadCrumb',
       'setTagNavList',
-      'addTag',
-      'setLocal'
-    ]),
-    ...mapActions([
-      'handleLogin'
+      'addTag'
     ]),
     turnToPage (name) {
-      if (name.indexOf('isTurnByHref_') > -1) {
-        window.open(name.split('_')[1])
-        return
-      }
+      // if (name.indexOf('isTurnByHref_') > -1) {
+      //   window.open(name.split('_')[1])
+      //   return
+      // }
       this.$router.push({
         name: name
       })
@@ -128,9 +114,10 @@ export default {
      */
     this.setTagNavList()
     this.addTag(this.$store.state.app.homeRoute)
-    this.setBreadCrumb(this.$route.matched)
+    //this.concatRoutes()
+    //this.setBreadCrumb(this.$route.matched)
     // 设置初始语言
-    this.setLocal(this.$i18n.locale)
+    // this.setLocal(this.$i18n.locale)
   }
 }
 </script>

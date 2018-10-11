@@ -5,10 +5,9 @@
 <template>
   <div class="login">
     <div class="login-con">
-      <Card icon="log-in" title="欢迎登录" :bordered="false">
+      <Card icon="log-in" title="账户登录" :bordered="false">
         <div class="form-con">
           <login-form @on-success-valid="handleSubmit"></login-form>
-          <p class="login-tip">输入任意用户名和密码即可</p>
         </div>
       </Card>
     </div>
@@ -17,23 +16,22 @@
 
 <script>
 import LoginForm from '_c/login-form'
-import { mapActions } from 'vuex'
+import {mapActions} from 'vuex'
 export default {
   components: {
     LoginForm
   },
   methods: {
     ...mapActions([
-      'handleLogin',
-      'getUserInfo'
+      'login'
     ]),
-    handleSubmit ({ userName, password }) {
-      this.handleLogin({ userName, password }).then(res => {
-        this.getUserInfo().then(res => {
-          this.$router.push({
-            name: 'home'
-          })
+    handleSubmit ({ username, password }) {
+      this.login({username,password}).then(res => {
+        this.$router.push({
+          name: 'home'
         })
+      }).catch(error => {
+
       })
     }
   }

@@ -158,7 +158,7 @@ export default {
       if(this.$refs['tree'].getSelectedNodes()[0]){
         this.user.deptId = this.$refs['tree'].getSelectedNodes()[0].deptId
       }
-      //console.log(this.user)
+      //console.log(this.login)
       this.addNew?
       addUser(this.user).then(res => {
         this.$Message.success('添加成功')
@@ -178,7 +178,7 @@ export default {
         }
         this.user.status = this.user.status === '1'
         this.deptTree = buildTableTree(treeShow(this.backUpDeptList,'deptId',this.user.deptId,this.getDeptParentId(this.user.deptId),true),'deptId','deptName')
-        //this.deptTree = selectDept(this.deptTree,this.user.deptId)
+        //this.deptTree = selectDept(this.deptTree,this.login.deptId)
         this.modalShow = true
       })
 

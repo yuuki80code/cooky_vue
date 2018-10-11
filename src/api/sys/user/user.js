@@ -28,9 +28,9 @@ export const addUser = ( user ) => {
 
 export const getUserWithRole = ( userId ) => {
   // var data = new URLSearchParams()
-  // for(let key in user){
+  // for(let key in login){
   //   console.log(key)
-  //   data.append(key,user[key])
+  //   data.append(key,login[key])
   // }
 
   return axios.request({

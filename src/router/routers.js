@@ -11,16 +11,7 @@ import parentView from '@/components/parent-view'
  * }
  */
 
-export default [
-  {
-    path: '/login',
-    name: 'login',
-    meta: {
-      title: 'Login - 登录',
-      hideInMenu: true
-    },
-    component: () => import('@/view/login/login.vue')
-  },
+export const routerMap = [
   {
     path: '/',
     name: '_home',
@@ -99,6 +90,18 @@ export default [
       }
     ]
   },
+
+]
+export const routes = [
+  {
+    path: '/login',
+    name: 'login',
+    meta: {
+      title: 'Login - 登录',
+      hideInMenu: true
+    },
+    component: () => import('@/view/login/login.vue')
+  },
   {
     path: '/401',
     name: 'error_401',
@@ -117,7 +120,6 @@ export default [
   },
   {
     path: '*',
-    name: 'error_404',
     meta: {
       hideInMenu: true
     },

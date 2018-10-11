@@ -22,7 +22,7 @@ class httpRequest {
   interceptors (instance, url) {
     // 添加请求拦截器
     instance.interceptors.request.use(config => {
-      if (!config.url.includes('/users')) {
+      if (!config.url.includes('/login')) {
         config.headers['Authorization'] = Cookies.get(TOKEN_KEY)
       }
       // Spin.show()
@@ -43,10 +43,9 @@ class httpRequest {
         }, 500)
       }
       if (data.code !== 200) {
-        // 后端服务在个别情况下回报201，待确认
         if (data.code === 401) {
           Cookies.remove(TOKEN_KEY)
-          window.location.href = '/#/login'
+          window.location.href = '/login'
           Message.error('未登录，或登录失效，请登录')
         } else {
           if (data.msg) Message.error(data.msg)
