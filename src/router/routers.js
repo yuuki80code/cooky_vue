@@ -12,6 +12,57 @@ import parentView from '@/components/parent-view'
  */
 
 export const routerMap = [
+
+  {
+    path: '/sys',
+    name: 'sys',
+    component: Main,
+    meta: {
+      icon: 'md-settings',
+      title: '系统管理'
+    },
+    children: [
+      {
+        path: 'sys_user',
+        name: 'user',
+        meta: {
+          icon: '_md-settings',
+          title: '用户管理'
+        },
+        component: () => import('@/view/sys/user')
+      },
+      {
+        path: 'sys_role',
+        name: 'role',
+        meta: {
+          icon: '_md-settings',
+          title: '角色管理'
+        },
+        component: () => import('@/view/sys/role')
+      },
+      {
+        path: 'sys_dept',
+        name: 'dept',
+        meta: {
+          icon: '_md-settings',
+          title: '部门管理'
+        },
+        component: () => import('@/view/sys/dept')
+      },
+      {
+        path: 'sys_menu',
+        name: 'menu',
+        meta: {
+          icon: '_md-settings',
+          title: '菜单管理'
+        },
+        component: () => import('@/view/sys/menu')
+      }
+    ]
+  },
+
+]
+export const routes = [
   {
     path: '/',
     name: '_home',
@@ -43,56 +94,6 @@ export const routerMap = [
       icon: 'ios-book'
     }
   },
-  {
-    path: '/sys',
-    name: 'sys',
-    component: Main,
-    meta: {
-      icon: 'md-settings',
-      title: '系统管理'
-    },
-    children: [
-      {
-        path: 'sys_user',
-        name: 'sys_user',
-        meta: {
-          icon: '_md-settings',
-          title: '用户管理'
-        },
-        component: () => import('@/view/sys/user')
-      },
-      {
-        path: 'sys_role',
-        name: 'sys_role',
-        meta: {
-          icon: '_md-settings',
-          title: '角色管理'
-        },
-        component: () => import('@/view/sys/role')
-      },
-      {
-        path: 'sys_dept',
-        name: 'sys_dept',
-        meta: {
-          icon: '_md-settings',
-          title: '部门管理'
-        },
-        component: () => import('@/view/sys/dept')
-      },
-      {
-        path: 'sys_menu',
-        name: 'sys_menu',
-        meta: {
-          icon: '_md-settings',
-          title: '菜单管理'
-        },
-        component: () => import('@/view/sys/menu')
-      }
-    ]
-  },
-
-]
-export const routes = [
   {
     path: '/login',
     name: 'login',

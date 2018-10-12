@@ -19,16 +19,16 @@
         :expand-type="props.expandType"
         :selection-type="props.selectionType">
         <template slot="id" scope="scope">
-          <Button type="primary" size="small" @click="handleEdit(scope.row)">编辑</Button>&nbsp;&nbsp;
+          <Button type="primary" size="small" v-if="rules.dept_edit" @click="handleEdit(scope.row)">编辑</Button>&nbsp;&nbsp;
           <Poptip v-show="scope.row.children.length !== 0"
             confirm
             :transfer = "true"
             title="将连带子部门一并删除，确定删除？"
             @on-ok="handleDelete(scope.row)"
             >
-            <Button type="error" size="small">删除</Button>
+            <Button type="error" size="small" v-if="rules.dept_delete">删除</Button>
           </Poptip>
-          <Button type="error" size="small" @click="handleDelete(scope.row)" v-show="scope.row.children.length === 0">删除</Button>
+          <Button type="error" size="small" @click="handleDelete(scope.row)" v-show="scope.row.children.length === 0" v-if="rules.dept_delete">删除</Button>
         </template>
       </zk-table>
     </Card>
@@ -54,6 +54,7 @@
 <script>
 import { getDeptTree,deleteDept,editDept } from '@/api/sys/dept/dept'
 import { buildTableTree,treeShow } from "@/libs/tools"
+import { mapState } from 'vuex'
 import deepClone from 'clone-deep'
 
 export default {
@@ -99,6 +100,11 @@ export default {
         }
       ]
     }
+  },
+  computed :{
+    ...mapState({
+      rules: state => state.app.rules
+    })
   },
   methods: {
     handleModalVisibleChange: function (event) {

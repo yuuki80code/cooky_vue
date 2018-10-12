@@ -18,7 +18,7 @@
           <Input type="text" v-model="roleForm.remark" placeholder="角色描述"/>
         </FormItem>
         <FormItem prop="parenId" label="菜单权限">
-          <Tree ref="tree" :data="menuTree" :multiple="true" children-key="children" show-checkbox></Tree>
+          <Tree ref="tree" :data="menuTree" :multiple="true" children-key="children"></Tree>
         </FormItem>
       </Form>
     </Modal>
@@ -119,7 +119,7 @@
           let tempTree = deepclone(this.backupMenuTree)
           tempTree.map(item => {
             if(res.data.indexOf(item.menuId)>-1){
-              item.checked = true
+              item.selected = true
             }
             return item
           })
@@ -139,7 +139,7 @@
       },
       handleModalOk: function () {
         const self = this
-        let checkNodes = this.$refs['tree'].getCheckedNodes()
+        let checkNodes = this.$refs['tree'].getSelectedNodes()
         checkNodes.forEach(node => {
           self.roleForm.menuIds.push(node.menuId)
         })

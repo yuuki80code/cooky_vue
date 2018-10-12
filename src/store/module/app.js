@@ -11,8 +11,9 @@ const state = {
   routerList: routes,
   breadCrumbList: [],
   tagNavList: [],
-  homeRoute: getHomeRoute(routerMap),
-  hasGetRules: false
+  homeRoute: getHomeRoute(routes),
+  hasGetRules: false,
+  rules: []
 }
 const getters = {
   menuList: (state, getters, rootState) => getMenuByRouter(state.routerList, 'all')
@@ -21,6 +22,9 @@ const mutations = {
   CONCAT_ROUTES (state, routerList) {
     state.routerList = routerList.concat(routes)
     state.hasGetRules = true
+  },
+  SET_RULES (state, rules) {
+    state.rules = rules
   },
   setBreadCrumb(state, routeMetched) {
     state.breadCrumbList = getBreadCrumbList(routeMetched, state.homeRoute)
@@ -53,18 +57,25 @@ const actions = {
     return new Promise((resolve, reject) => {
       try {
         let routerList = []
-        if (Object.entries(rules).every(item => item[1])) {
-          routerList = routerMap
-        } else {
-          routerList = getAccesRouterList(routerMap, rules)
-        }
+        // if (Object.entries(rules).every(item => item[1])) {
+        //   routerList = routerMap
+        // } else {
+        routerList = getAccesRouterList(routerMap, rules.menu)
+       // }
         commit('CONCAT_ROUTES', routerList)
+        commit('SET_RULES',rules.button)
         resolve(state.routerList)
       } catch (err) {
         reject(err)
       }
     })
-  }
+  },
+  // getUserRoutes({commit}) {
+  //   return new Promise((resolve,reject) => {
+  //
+  //   })
+  // }
+
 }
 export default {
   state,

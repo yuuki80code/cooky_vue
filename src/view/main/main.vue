@@ -114,6 +114,7 @@ export default {
      */
     this.setTagNavList()
     this.addTag(this.$store.state.app.homeRoute)
+    console.log(this.menuList)
     //this.concatRoutes()
     //this.setBreadCrumb(this.$route.matched)
     // 设置初始语言

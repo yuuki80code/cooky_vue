@@ -4,6 +4,7 @@ import {routes, routerMap} from './routers'
 import store from '@/store'
 import iView from 'iview'
 import {getToken, setToken, canTurnTo} from '@/libs/util'
+import {getUserMenu} from "@/api/login/login";
 
 Vue.use(Router)
 const r = routerMap.concat(routes)
@@ -46,26 +47,16 @@ router.beforeEach((to, from, next) => {
     //   next({ name: 'login' })
     // })
     if (!store.state.app.hasGetRules) {
-      console.log('路由重载了！----1')
-      //store.dispatch('authorization').then(rules => {
-      const rules = {
-        _home: true,
-        home: true,
-        doc: true,
-        sys: true,
-        sys_user: true,
-        sys_role: true,
-        sys_dept: true,
-      }
-      store.dispatch('concatRoutes', rules).then(routers => {
-        console.log('路由重载了！----2')
-        router.addRoutes(routers)
-        console.log(routers)
-        next({...to, replace: true})
-      }).catch(() => {
-        next({name: 'login'})
+      getUserMenu().then(rules => {
+
+        store.dispatch('concatRoutes', rules.data).then(routers => {
+          router.addRoutes(routers)
+          console.log(routers)
+          next({...to, replace: true})
+        }).catch(() => {
+          next({name: 'login'})
+        })
       })
-      // })
     } else {
       next()
     }

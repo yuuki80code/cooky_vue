@@ -11,12 +11,9 @@ export const login = ({username,password}) => {
   })
 }
 
-export const getUserMenu = (username) => {
-  const data = new URLSearchParams()
-  data.append("username",username)
+export const getUserMenu = () => {
   return axios.request({
     url: '/menu/usermenu',
-    data,
     method: 'post'
   })
 }

@@ -1,8 +1,8 @@
 import Axios from 'axios'
 import baseURL from '_conf/url'
 import { Message } from 'iview'
-import Cookies from 'js-cookie'
-import { TOKEN_KEY } from '@/libs/util'
+import {getToken} from "./util";
+
 class httpRequest {
   constructor () {
     this.options = {
@@ -23,7 +23,7 @@ class httpRequest {
     // 添加请求拦截器
     instance.interceptors.request.use(config => {
       if (!config.url.includes('/login')) {
-        config.headers['Authorization'] = Cookies.get(TOKEN_KEY)
+        config.headers['Authorization'] = getToken()
       }
       // Spin.show()
       // 在发送请求之前做些什么
