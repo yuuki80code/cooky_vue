@@ -1,7 +1,7 @@
 <template>
   <div>
     <Card>
-      <Button style="margin: 10px 0;" type="primary" @click="modalShow=true">新增角色</Button>
+      <Button style="margin: 10px 0;" type="primary" @click="modalShow=true" v-if="rules.role_add">新增角色</Button>
       <Table border :columns="roleColum" :data="roleList"></Table>
     </Card>
     <Modal
@@ -26,10 +26,11 @@
 </template>
 
 <script>
-  import { getRoleList,editRole,getMenus,deleteRole } from '@/api/sys/role/role'
+  import { getRoleList,addRole,updateRole,getMenus,deleteRole } from '@/api/sys/role/role'
   import { getMenu } from '@/api/sys/menu/menu'
   import { buildTableTree } from "@/libs/tools"
   import deepclone from 'clone-deep'
+  import {mapState} from 'vuex'
 
   export default {
     name: "role",
@@ -52,42 +53,48 @@
             title: '操作',
             key: 'action',
             render: (h, params) => {
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.handleEdit(params.row)
-                    }
+              let btnEdit = h('Button', {
+                props: {
+                  type: 'primary',
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.handleEdit(params.row)
                   }
-                }, '编辑'),
-                h('Button', {
-                  props: {
-                    type: 'error',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.handleDelete(params.row)
-                    }
+                }
+              }, '编辑')
+              let btnDel = h('Button', {
+                props: {
+                  type: 'error',
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.handleDelete(params.row)
                   }
-                }, '删除')
-              ])
+                }
+              }, '删除')
+              if(this.rules.role_edit && this.rules.role_delete) {
+                return h('div', [btnEdit,btnDel])
+              } else if(this.rules.role_edit && !this.rules.role_delete){
+                return h('div', [btnEdit])
+              } else if(!this.rules.role_edit && this.rules.role_delete){
+                return h('div', [btnDel])
+              } else {
+                return h('div', [])
+              }
             }
           }
         ],
         roleList: [],
         modalShow: false,
-        modalTitle: '新增角色',
         menuTree: [],
         backupMenuTree: [],
         roleForm: {
@@ -97,6 +104,14 @@
           menuIds: []
         }
       }
+    },
+    computed: {
+      ...mapState({
+        rules: state => state.app.rules
+      }),
+      modalTitle: function () {
+        return this.roleForm.roleId === 0 ? '新增角色':'修改角色'
+      },
     },
     methods: {
       _getRole: function () {
@@ -143,12 +158,18 @@
         checkNodes.forEach(node => {
           self.roleForm.menuIds.push(node.menuId)
         })
-        console.log(this.roleForm)
-        editRole(this.roleForm).then(res => {
-          this.$Message.success(res.msg)
-          this.reset()
-          this._getRole()
-        })
+        if(this.roleForm.roleId === 0) {
+          addRole(this.roleForm).then(res => {
+            this.$Message.success(res.msg)
+            this._getRole()
+          })
+        }else {
+          updateRole(this.roleForm).then(res => {
+            this.$Message.success(res.msg)
+            this._getRole()
+          })
+        }
+
       },
       reset: function () {
         this.roleForm = {

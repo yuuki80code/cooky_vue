@@ -14,13 +14,25 @@ export const getDeptTree = () => {
 //   })
 // }
 
-export const editDept = (dept) => {
+export const addDept = (dept) => {
   const data = new URLSearchParams()
   for(let key in dept){
     data.append(key,dept[key])
   }
   return axios.request({
-    url: '/dept/edit',
+    url: '/dept/add',
+    data,
+    method: 'post'
+  })
+}
+
+export const updateDept = (dept) => {
+  const data = new URLSearchParams()
+  for(let key in dept){
+    data.append(key,dept[key])
+  }
+  return axios.request({
+    url: '/dept/update',
     data,
     method: 'post'
   })

@@ -1,7 +1,7 @@
 <template>
     <div>
       <Card>
-        <Button style="margin: 10px 0;" type="primary" @click="modalShow=true">新增菜单</Button>
+        <Button style="margin: 10px 0;" type="primary" @click="modalShow=true" v-if="rules.menu_add">新增菜单</Button>
         <zk-table
           ref="table"
           sum-text="sum"
@@ -18,20 +18,20 @@
           :is-fold="props.isFold"
           :expand-type="props.expandType"
           :selection-type="props.selectionType">
-          <template slot="type" scope="scope">
+          <template slot="type" slot-scope="scope">
             <Tag :color="scope.row.type==0?'success':'warning'">{{scope.row.type==0?'菜单':'按钮'}}</Tag>
           </template>
-          <template slot="id" scope="scope">
-            <Button type="primary" size="small" @click="handleEdit(scope.row)">编辑</Button>&nbsp;&nbsp;
+          <template slot="id" slot-scope="scope">
+            <Button type="primary" size="small" @click="handleEdit(scope.row)" v-if="rules.menu_edit">编辑</Button>&nbsp;&nbsp;
             <Poptip v-show="scope.row.children.length !== 0"
                     confirm
                     :transfer = "true"
                     title="子菜单将升级成一级菜单，确定删除？"
                     @on-ok="handleDelete(scope.row)"
             >
-              <Button type="error" size="small">删除</Button>
+              <Button type="error" size="small" v-if="rules.menu_delete">删除</Button>
             </Poptip>
-            <Button type="error" size="small" @click="handleDelete(scope.row)" v-show="scope.row.children.length === 0">删除</Button>
+            <Button type="error" size="small" @click="handleDelete(scope.row)" v-show="scope.row.children.length === 0" v-if="rules.menu_delete">删除</Button>
           </template>
         </zk-table>
       </Card>
@@ -66,8 +66,9 @@
 </template>
 
 <script>
-  import { getMenu,editMenu,deleteMenu } from "@/api/sys/menu/menu"
+  import { getMenu,addMenu,updateMenu,deleteMenu } from "@/api/sys/menu/menu"
   import { buildTableTree,treeShow } from "@/libs/tools"
+  import { mapState } from 'vuex'
 
   export default {
       name: "imenu",
@@ -85,7 +86,6 @@
             expandType: false,
             selectionType: false
           },
-          modalTitle: '新增菜单/按钮',
           modalShow: false,
           menuForm: {
             menuId: 0,
@@ -130,6 +130,14 @@
           ]
         }
       },
+    computed: {
+      ...mapState({
+        rules: state => state.app.rules
+      }),
+      modalTitle: function () {
+        return this.menuForm.menuId === 0 ? '新增菜单/按钮':'修改菜单/按钮'
+      },
+    },
       methods: {
         _getMenu: function () {
           getMenu().then(res => {
@@ -161,12 +169,18 @@
           if(this.$refs['tree'].getSelectedNodes()[0]){
             this.menuForm.parentId = this.$refs['tree'].getSelectedNodes()[0].menuId
           }
-          console.log(this.menuForm)
-          editMenu(this.menuForm).then(res => {
-            this.$Message.success(res.msg)
-            this._getMenu()
-            this.reset()
-          })
+          if(this.menuForm.menuId===0) {
+            addMenu(this.menuForm).then(res => {
+              this.$Message.success(res.msg)
+              this._getMenu()
+            })
+          }else {
+            updateMenu(this.menuForm).then(res => {
+              this.$Message.success(res.msg)
+              this._getMenu()
+            })
+          }
+
           //this.reset()
         },
         handleModalVisibleChange: function (event) {

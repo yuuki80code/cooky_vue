@@ -1,7 +1,7 @@
 <template>
   <div>
     <Card>
-      <Button style="margin: 10px 0;" type="primary" @click="modalShow=true">新增部门</Button>
+      <Button style="margin: 10px 0;" type="primary" @click="modalShow=true" v-if="rules.dept_add">新增部门</Button>
       <zk-table
         ref="table"
         sum-text="sum"
@@ -18,7 +18,7 @@
         :is-fold="props.isFold"
         :expand-type="props.expandType"
         :selection-type="props.selectionType">
-        <template slot="id" scope="scope">
+        <template slot="id" slot-scope="scope">
           <Button type="primary" size="small" v-if="rules.dept_edit" @click="handleEdit(scope.row)">编辑</Button>&nbsp;&nbsp;
           <Poptip v-show="scope.row.children.length !== 0"
             confirm
@@ -52,10 +52,9 @@
 </template>
 
 <script>
-import { getDeptTree,deleteDept,editDept } from '@/api/sys/dept/dept'
+import { getDeptTree,deleteDept,addDept,updateDept } from '@/api/sys/dept/dept'
 import { buildTableTree,treeShow } from "@/libs/tools"
 import { mapState } from 'vuex'
-import deepClone from 'clone-deep'
 
 export default {
   name: 'dept',
@@ -73,7 +72,6 @@ export default {
         expandType: false,
         selectionType: false
       },
-      modalTitle: '新增部门',
       modalShow: false,
       deptTree: [],
       deptTreeClone: [],
@@ -104,7 +102,10 @@ export default {
   computed :{
     ...mapState({
       rules: state => state.app.rules
-    })
+    }),
+    modalTitle: function () {
+      return this.deptForm.deptId === 0 ? '新增部门':'修改部门'
+    }
   },
   methods: {
     handleModalVisibleChange: function (event) {
@@ -115,10 +116,18 @@ export default {
         this.deptForm.parentId = this.$refs['tree'].getSelectedNodes()[0].deptId
       }
       //console.log(this.deptForm)
-      editDept(this.deptForm).then(res => {
-        this.$Message.success(res.msg)
-        this._getDeptTree()
-      })
+      if(this.deptForm.deptId===0){
+        addDept(this.deptForm).then(res => {
+          this.$Message.success(res.msg)
+          this._getDeptTree()
+        })
+      }else {
+        updateDept(this.deptForm).then(res => {
+          this.$Message.success(res.msg)
+          this._getDeptTree()
+        })
+      }
+
     },
     handleEdit: function(row) {
       //console.log(row)

@@ -7,18 +7,29 @@ export const getMenu = () => {
   })
 }
 
-export const editMenu = (menu) => {
+
+export const addMenu = (menu) => {
   const data = new URLSearchParams()
   for (let key in menu) {
     data.append(key,menu[key])
   }
   return axios.request({
-    url: '/menu/edit',
+    url: '/menu/add',
     data,
     method: 'post'
   })
 }
-
+export const updateMenu = (menu) => {
+  const data = new URLSearchParams()
+  for (let key in menu) {
+    data.append(key,menu[key])
+  }
+  return axios.request({
+    url: '/menu/update',
+    data,
+    method: 'post'
+  })
+}
 export const deleteMenu = (id) => {
   const data = new URLSearchParams()
   data.append("id",id)

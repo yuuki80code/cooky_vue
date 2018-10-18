@@ -19,9 +19,9 @@
       </Header>
       <Content>
         <Layout>
-          <div class="tag-nav-wrapper">
-            <tags-nav :value="$route" @input="handleClick" :list="tagNavList" @on-close="handleCloseTag"/>
-          </div>
+          <!--<div class="tag-nav-wrapper">-->
+            <!--<tags-nav :value="$route" @input="handleClick" :list="tagNavList" @on-close="handleCloseTag"/>-->
+          <!--</div>-->
           <Content class="content-wrapper">
             <keep-alive :include="cacheList">
               <router-view/>
@@ -81,12 +81,9 @@ export default {
       'addTag'
     ]),
     turnToPage (name) {
-      // if (name.indexOf('isTurnByHref_') > -1) {
-      //   window.open(name.split('_')[1])
-      //   return
-      // }
+
       this.$router.push({
-        name: name
+        name
       })
     },
     handleCollapsedChange (state) {
@@ -103,7 +100,7 @@ export default {
     }
   },
   watch: {
-    '$route' (newRoute) {
+    '$route' (oldRouter,newRoute) {
       this.setBreadCrumb(newRoute.matched)
       this.setTagNavList(getNewTagList(this.tagNavList, newRoute))
     }
@@ -114,7 +111,6 @@ export default {
      */
     this.setTagNavList()
     this.addTag(this.$store.state.app.homeRoute)
-    console.log(this.menuList)
     //this.concatRoutes()
     //this.setBreadCrumb(this.$route.matched)
     // 设置初始语言

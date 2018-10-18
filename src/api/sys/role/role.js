@@ -8,13 +8,25 @@ export const getRoleList = () => {
   })
 }
 
-export const editRole = (role) => {
+export const addRole = (role) => {
   const data = new URLSearchParams()
   for(let key in role) {
     data.append(key,role[key])
   }
   return axios.request({
-    url: '/role/edit',
+    url: '/role/add',
+    data,
+    method: 'post'
+  })
+}
+
+export const updateRole = (role) => {
+  const data = new URLSearchParams()
+  for(let key in role) {
+    data.append(key,role[key])
+  }
+  return axios.request({
+    url: '/role/update',
     data,
     method: 'post'
   })

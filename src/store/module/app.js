@@ -6,6 +6,7 @@ import {
   getHomeRoute
 } from '@/libs/util'
 import { routes, routerMap } from '@/router/routers'//import routers from '@/router/routers'
+import deepclone from 'clone-deep'
 
 const state = {
   routerList: routes,
@@ -22,6 +23,14 @@ const mutations = {
   CONCAT_ROUTES (state, routerList) {
     state.routerList = routerList.concat(routes)
     state.hasGetRules = true
+  },
+  LOGOUT (state, param) {
+    state.hasGetRules = false
+    state.routerList=routes
+    state.breadCrumbList= []
+    state.tagNavList= []
+    state.homeRoute=getHomeRoute(routes)
+    state.rules= []
   },
   SET_RULES (state, rules) {
     state.rules = rules
@@ -60,7 +69,8 @@ const actions = {
         // if (Object.entries(rules).every(item => item[1])) {
         //   routerList = routerMap
         // } else {
-        routerList = getAccesRouterList(routerMap, rules.menu)
+        let routerMapClone = deepclone(routerMap)
+        routerList = getAccesRouterList(routerMapClone, rules.menu)
        // }
         commit('CONCAT_ROUTES', routerList)
         commit('SET_RULES',rules.button)

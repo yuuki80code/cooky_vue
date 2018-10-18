@@ -1,12 +1,12 @@
 <template>
     <div>
       <Card>
-        <Button style="margin: 10px 0;" type="primary" @click="modalShow=true">新增用户</Button>
+        <Button style="margin: 10px 0;" type="primary" @click="modalShow=true" v-if="rules.user_add">新增用户</Button>
         <Table border :columns="columns" :data="tableData"></Table>
         <Page class="page" :total="total" :current="curr" :page-size="pageSize" show-sizer :on-change="onPageChange" :on-page-size-change="onPageSizeChange" />
       </Card>
       <Modal
-        :title="addNew?'新增用户':'修改用户'"
+        :title="modalTitle"
         v-model="modalShow"
         :mask-closable="false"
         @on-visible-change="handleModalVisibleChange"
@@ -16,7 +16,7 @@
             <FormItem prop="username" label="用户名" required>
               <Input type="text" v-model="user.username" placeholder="用户名"/>
             </FormItem>
-            <FormItem prop="password" label="密码" required v-show="addNew">
+            <FormItem prop="password" label="密码" required v-show="this.user.userId === 0">
               <Input type="text" v-model="user.password" placeholder="密码" />
             </FormItem>
             <FormItem prop="dept" label="部门">
@@ -54,6 +54,7 @@ import { getUserList, addUser,getUserWithRole,updateUser,deleteUser } from '@/ap
 import { getDeptTree } from '@/api/sys/dept/dept'
 import { getRoleList } from '@/api/sys/role/role'
 import { buildTableTree,treeShow } from "@/libs/tools"
+import { mapState } from 'vuex'
 
 export default {
   name: 'user',
@@ -62,10 +63,9 @@ export default {
       curr: 1,
       pageSize: 10,
       total: 0,
-      modalTitle: '新增用户',
       modalShow: false,
       user: {
-        userId: '',
+        userId: 0,
         username: '',
         password: '',
         deptId: '0',
@@ -100,45 +100,57 @@ export default {
           title: '操作',
           key: 'action',
           render: (h, params) => {
-            return h('div', [
-              h('Button', {
-                props: {
-                  type: 'primary',
-                  size: 'small'
-                },
-                style: {
-                  marginRight: '5px'
-                },
-                on: {
-                  click: () => {
-                    this.handleEdit(params.row)
-                  }
+            let btnEdit = h('Button', {
+              props: {
+                type: 'primary',
+                size: 'small'
+              },
+              style: {
+                marginRight: '5px',
+              },
+              on: {
+                click: () => {
+                  this.handleEdit(params.row)
                 }
-              }, '编辑'),
-              h('Button', {
-                props: {
-                  type: 'error',
-                  size: 'small'
-                },
-                style: {
-                  marginRight: '5px'
-                },
-                on: {
-                  click: () => {
-                    this.handleDelete(params.row.userId)
-                  }
+              }
+            }, '编辑')
+            let btnDel = h('Button', {
+              props: {
+                type: 'error',
+                size: 'small'
+              },
+              style: {
+                marginRight: '5px'
+              },
+              on: {
+                click: () => {
+                  this.handleDelete(params.row.userId)
                 }
-              }, '删除')
-            ])
+              }
+            }, '删除')
+            if(this.rules.user_edit && this.rules.user_delete) {
+              return h('div', [btnEdit,btnDel])
+            } else if(this.rules.user_edit && !this.rules.user_delete){
+              return h('div', [btnEdit])
+            } else if(!this.rules.user_edit && this.rules.user_delete){
+              return h('div', [btnDel])
+            } else {
+              return h('div', [])
+            }
           }
+
+
         }
       ],
       tableData: []
     }
   },
-  computed: {
-    addNew: function () {
-      return this.user.userId===''
+  computed :{
+    ...mapState({
+      rules: state => state.app.rules
+    }),
+    modalTitle: function () {
+      return this.user.userId === 0 ? '新增用户':'修改用户'
     }
   },
   methods: {
@@ -159,17 +171,18 @@ export default {
         this.user.deptId = this.$refs['tree'].getSelectedNodes()[0].deptId
       }
       //console.log(this.login)
-      this.addNew?
-      addUser(this.user).then(res => {
-        this.$Message.success('添加成功')
-        this._getUserList()
-      })
-      :
-      updateUser(this.user).then(res => {
+      if(this.user.userId===0){
+        addUser(this.user).then(res => {
+          this.$Message.success('添加成功')
+          this._getUserList()
+        })
+      } else {
+        updateUser(this.user).then(res => {
 
-        this.$Message.success('修改成功')
-        this._getUserList()
-      })
+          this.$Message.success('修改成功')
+          this._getUserList()
+        })
+      }
     },
     handleEdit: function(row) {
       getUserWithRole(row.userId).then(res=>{

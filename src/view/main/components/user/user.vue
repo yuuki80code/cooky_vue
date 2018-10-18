@@ -12,6 +12,7 @@
 
 <script>
 import './user.less'
+import {setToken} from '@/libs/util'
 export default {
   name: 'User',
   props: {
@@ -22,6 +23,9 @@ export default {
   },
   methods: {
     handleClick (name) {
+      this.$store.commit('LOGOUT',{})
+      setToken("")
+      localStorage.clear()
       this.$router.push({
         name: 'login'
       })

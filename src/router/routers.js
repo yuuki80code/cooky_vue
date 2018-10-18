@@ -79,7 +79,7 @@ export const routes = [
         meta: {
           hideInMenu: true,
           title: '首页',
-          notCache: true
+          //notCache: true
         },
         component: () => import('@/view/single-page/home')
       }

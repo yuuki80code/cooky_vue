@@ -48,10 +48,8 @@ router.beforeEach((to, from, next) => {
     // })
     if (!store.state.app.hasGetRules) {
       getUserMenu().then(rules => {
-
         store.dispatch('concatRoutes', rules.data).then(routers => {
           router.addRoutes(routers)
-          console.log(routers)
           next({...to, replace: true})
         }).catch(() => {
           next({name: 'login'})
