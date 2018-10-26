@@ -25,7 +25,7 @@ export default {
     handleClick (name) {
       this.$store.commit('LOGOUT',{})
       setToken("")
-      localStorage.clear()
+      sessionStorage.clear()
       this.$router.push({
         name: 'login'
       })

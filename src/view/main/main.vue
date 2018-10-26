@@ -1,11 +1,9 @@
 <template>
   <Layout style="height: 100%" class="main">
-    <Sider hide-trigger collapsible :width="256" :collapsed-width="64" v-model="collapsed" :style="{background:'#fff'}">
-      <side-menu accordion :active-name="$route.name" :collapsed="collapsed" @on-select="turnToPage" :menu-list="menuList">
+    <Sider hide-trigger collapsible :width="256" :collapsed-width="64" v-model="collapsed" class="left-sider" :style="{background:'#fff',overflow:'hidden'}">
+      <side-menu accordion ref="sideMenu" :active-name="$route.name" :collapsed="collapsed" @on-select="turnToPage" :menu-list="menuList">
         <!-- 需要放在菜单上面的内容，如Logo，写在side-menu标签内部，如下 -->
         <div class="logo-con">
-          <!--<img v-show="!collapsed" :src="maxLogo" key="max-logo" />-->
-          <!--<img v-show="collapsed" :src="minLogo" key="min-logo" />-->
           <h1 v-show="!collapsed" >FEBS</h1>
           <img v-show="collapsed" src="/sider.jpg" style="width: 50px; height: 50px; float:left; border-radius: 50%; border: 3px solid #eee; overflow: hidden;"></img>
         </div>
@@ -17,11 +15,11 @@
           <user user-avator="/sider.jpg"/>
         </header-bar>
       </Header>
-      <Content>
-        <Layout>
-          <!--<div class="tag-nav-wrapper">-->
-            <!--<tags-nav :value="$route" @input="handleClick" :list="tagNavList" @on-close="handleCloseTag"/>-->
-          <!--</div>-->
+      <Content class="main-content-con">
+        <Layout class="main-layout-con">
+          <div class="tag-nav-wrapper">
+            <tags-nav :value="$route" @input="handleClick" :list="tagNavList" @on-close="handleCloseTag"/>
+          </div>
           <Content class="content-wrapper">
             <keep-alive :include="cacheList">
               <router-view/>
@@ -38,7 +36,7 @@ import HeaderBar from './components/header-bar'
 import TagsNav from './components/tags-nav'
 import User from './components/user'
 import { mapMutations, mapActions } from 'vuex'
-import { getNewTagList, getNextName } from '@/libs/util'
+import { getNewTagList, getNextRoute, routeEqual } from '@/libs/util'
 import './main.less'
 export default {
   name: 'Main',
@@ -61,60 +59,98 @@ export default {
     tagRouter () {
       return this.$store.state.app.tagRouter
     },
-    // userAvator () {
-    //   return this.$store.state.login.avatorImgPath
-    // },
+    userAvator () {
+      return this.$store.state.user.avatorImgPath
+    },
     cacheList () {
       return this.tagNavList.length ? this.tagNavList.filter(item => !(item.meta && item.meta.notCache)).map(item => item.name) : []
     },
     menuList () {
       return this.$store.getters.menuList
     },
-    // local () {
-    //   return this.$store.state.app.local
-    // }
+    local () {
+      return this.$store.state.app.local
+    }
   },
   methods: {
     ...mapMutations([
       'setBreadCrumb',
       'setTagNavList',
-      'addTag'
+      'addTag',
     ]),
-    turnToPage (name) {
+    ...mapActions([
+      'handleLogin'
+    ]),
+    turnToPage (route) {
 
+      let { name, params, query } = {}
+      if (typeof route === 'string') name = route
+      else {
+        name = route.name
+        params = route.params
+        query = route.query
+      }
+      if (name.indexOf('isTurnByHref_') > -1) {
+        window.open(name.split('_')[1])
+        return
+      }
       this.$router.push({
-        name
+        name,
+        params,
+        query
       })
     },
     handleCollapsedChange (state) {
       this.collapsed = state
     },
-    handleCloseTag (res, type, name) {
-      const nextName = getNextName(this.tagNavList, name)
+    handleCloseTag (res, type, route) {
+      let openName = ''
+      if (type === 'all') {
+        this.turnToPage('home')
+        openName = 'home'
+      } else if (routeEqual(this.$route, route)) {
+        if (type === 'others') {
+          openName = route.name
+        } else {
+          const nextRoute = getNextRoute(this.tagNavList, route)
+          this.$router.push(nextRoute)
+          openName = nextRoute.name
+        }
+      }
       this.setTagNavList(res)
-      if (type === 'all') this.turnToPage('home')
-      else if (this.$route.name === name) this.$router.push({ name: nextName })
+      this.$refs.sideMenu.updateOpenName(openName)
     },
     handleClick (item) {
-      this.turnToPage(item.name)
+      this.turnToPage(item)
     }
   },
   watch: {
-    '$route' (oldRouter,newRoute) {
+    '$route' (newRoute){
       this.setBreadCrumb(newRoute.matched)
       this.setTagNavList(getNewTagList(this.tagNavList, newRoute))
-    }
+    },
   },
   mounted () {
     /**
      * @description 初始化设置面包屑导航和标签导航
      */
     this.setTagNavList()
-    this.addTag(this.$store.state.app.homeRoute)
-    //this.concatRoutes()
-    //this.setBreadCrumb(this.$route.matched)
-    // 设置初始语言
-    // this.setLocal(this.$i18n.locale)
+    this.addTag({
+      route: this.$store.state.app.homeRoute
+    })
+    if(this.$route.name!== 'home'){
+      let route = {
+        path: this.$route.path,
+        name: this.$route.name,
+        meta: this.$route.meta,
+      }
+      this.addTag({
+        route: route
+      })
+    }
+
+    this.setBreadCrumb(this.$route.matched)
+
   }
 }
 </script>

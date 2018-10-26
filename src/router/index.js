@@ -48,12 +48,22 @@ router.beforeEach((to, from, next) => {
     // })
     if (!store.state.app.hasGetRules) {
       getUserMenu().then(rules => {
-        store.dispatch('concatRoutes', rules.data).then(routers => {
-          router.addRoutes(routers)
-          next({...to, replace: true})
-        }).catch(() => {
+        if(rules.code===200){
+          store.dispatch('concatRoutes', rules.data).then(routers => {
+            router.addRoutes(routers)
+            next({...to, replace: true})
+          }).catch(() => {
+            store.commit('LOGOUT',{})
+            setToken('')
+            sessionStorage.clear()
+            next({name: 'login'})
+          })
+        }else{
+          store.commit('LOGOUT',{})
+          setToken('')
+          sessionStorage.clear()
           next({name: 'login'})
-        })
+        }
       })
     } else {
       next()

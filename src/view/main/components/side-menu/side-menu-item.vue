@@ -1,11 +1,11 @@
 <template>
   <Submenu :name="`${parentName}`">
     <template slot="title">
-      <Icon :type="parentItem.icon"/>
+      <common-icon :type="parentItem.icon || ''"/>
       <span>{{ showTitle(parentItem) }}</span>
     </template>
     <template v-for="item in children">
-      <template v-if="item.children && item.children.length === 1">
+      <template v-if="item.children && item.children.length >0">
         <side-menu-item v-if="showChildren(item)" :key="`menu-${item.name}`" :parent-item="item"></side-menu-item>
         <menu-item v-else :name="getNameOrHref(item, true)" :key="`menu-${item.children[0].name}`"><common-icon :type="item.children[0].icon || ''"/><span>{{ showTitle(item.children[0]) }}</span></menu-item>
       </template>

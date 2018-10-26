@@ -1,6 +1,4 @@
 import Main from '@/view/main'
-import parentView from '@/components/parent-view'
-
 /**
  * iview-admin中meta除了原生参数外可配置的参数:
  * meta: {
@@ -19,7 +17,8 @@ export const routerMap = [
     component: Main,
     meta: {
       icon: 'md-settings',
-      title: '系统管理'
+      title: '系统管理',
+      notCache: true
     },
     children: [
       {
@@ -27,7 +26,8 @@ export const routerMap = [
         name: 'user',
         meta: {
           icon: '_md-settings',
-          title: '用户管理'
+          title: '用户管理',
+          notCache: true
         },
         component: () => import('@/view/sys/user')
       },
@@ -36,7 +36,8 @@ export const routerMap = [
         name: 'role',
         meta: {
           icon: '_md-settings',
-          title: '角色管理'
+          title: '角色管理',
+          notCache: true
         },
         component: () => import('@/view/sys/role')
       },
@@ -45,7 +46,8 @@ export const routerMap = [
         name: 'dept',
         meta: {
           icon: '_md-settings',
-          title: '部门管理'
+          title: '部门管理',
+          notCache: true
         },
         component: () => import('@/view/sys/dept')
       },
@@ -54,7 +56,8 @@ export const routerMap = [
         name: 'menu',
         meta: {
           icon: '_md-settings',
-          title: '菜单管理'
+          title: '菜单管理',
+          notCache: true
         },
         component: () => import('@/view/sys/menu')
       }
@@ -65,7 +68,6 @@ export const routerMap = [
 export const routes = [
   {
     path: '/',
-    name: '_home',
     redirect: '/home',
     component: Main,
     meta: {

@@ -3,7 +3,8 @@ import {
   setTagNavListInLocalstorage,
   getMenuByRouter,
   getTagNavListFromLocalstorage,
-  getHomeRoute
+  getHomeRoute,
+  routeHasExist
 } from '@/libs/util'
 import { routes, routerMap } from '@/router/routers'//import routers from '@/router/routers'
 import deepclone from 'clone-deep'
@@ -44,10 +45,13 @@ const mutations = {
       setTagNavListInLocalstorage([...list])
     } else state.tagNavList = getTagNavListFromLocalstorage()
   },
-  addTag(state, item, type = 'unshift') {
-    if (state.tagNavList.findIndex(tag => tag.name === item.name) < 0) {
-      if (type === 'push') state.tagNavList.push(item)
-      else state.tagNavList.unshift(item)
+  addTag(state, { route, type = 'unshift' }) {
+    if (!routeHasExist(state.tagNavList, route)) {
+      if (type === 'push') state.tagNavList.push(route)
+      else {
+        if (route.name === 'home') state.tagNavList.unshift(route)
+        else state.tagNavList.splice(1, 0, route)
+      }
       setTagNavListInLocalstorage([...state.tagNavList])
     }
   }

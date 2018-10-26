@@ -44,7 +44,6 @@ class httpRequest {
       }
       if (data.code !== 200) {
         if (data.code === 401) {
-          Cookies.remove(TOKEN_KEY)
           window.location.href = '/login'
           Message.error('未登录，或登录失效，请登录')
         } else {
