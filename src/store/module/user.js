@@ -1,10 +1,8 @@
 import {login} from '@/api/login/login'
-import {setToken} from "@/libs/util";
+import {setToken,setUserName} from "@/libs/util";
 
 export default {
   state: {
-    username: '',
-    isExistUserName: false
   },
   getters: {
 
@@ -15,7 +13,8 @@ export default {
         login({username, password}).then(res => {
           if (res) {
             setToken(res.data.token)
-            commit('SET_USER_NAME',res.data.username)
+            // commit('SET_USER_NAME',res.data.username)
+            setUserName(res.data.username)
             resolve()
           } else {
             reject(new Error('error'))

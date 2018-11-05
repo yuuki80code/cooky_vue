@@ -17,3 +17,10 @@ export const getUserMenu = () => {
     method: 'post'
   })
 }
+
+export const refreshToken = (token) => {
+  return axios.request({
+    url: `/refresh/${token}`,
+    method: 'post'
+  })
+}

@@ -43,9 +43,10 @@ class httpRequest {
         }, 500)
       }
       if (data.code !== 200) {
-        if (data.code === 401) {
-          window.location.href = '/login'
+        if (data.code === 403) {
           Message.error('未登录，或登录失效，请登录')
+          window.location.href = '/login'
+          sessionStorage.clear()  //清除token避免路由跳转死循环
         } else {
           if (data.msg) Message.error(data.msg)
         }

@@ -1,5 +1,6 @@
 <template>
   <div class="user-avator-dropdown">
+    <span style="margin-right: 10px;font-size: 16px;">{{username}}</span>
     <Dropdown @on-click="handleClick">
       <Avatar :src="userAvator"/>
       <Icon :size="18" type="md-arrow-dropdown"></Icon>
@@ -12,13 +13,18 @@
 
 <script>
 import './user.less'
-import {setToken} from '@/libs/util'
+import {setToken,getUserName} from '@/libs/util'
 export default {
   name: 'User',
   props: {
     userAvator: {
       type: String,
       default: ''
+    }
+  },
+  computed: {
+    username: function() {
+      return getUserName()
     }
   },
   methods: {

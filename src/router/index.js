@@ -4,7 +4,7 @@ import {routes, routerMap} from './routers'
 import store from '@/store'
 import iView from 'iview'
 import {getToken, setToken, canTurnTo} from '@/libs/util'
-import {getUserMenu} from "@/api/login/login";
+import {getUserMenu,refreshToken} from "@/api/login/login";
 
 Vue.use(Router)
 const r = routerMap.concat(routes)
@@ -45,6 +45,10 @@ router.beforeEach((to, from, next) => {
     // }).catch(() => {
     //   setToken('')
     //   next({ name: 'login' })
+    // })
+    // refreshToken(token).then(res=>{
+    //   console.log(res)
+    //   setToken(res.data.data)
     // })
     if (!store.state.app.hasGetRules) {
       getUserMenu().then(rules => {

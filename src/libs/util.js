@@ -298,3 +298,9 @@ export const findNodeDownward = (ele, tag) => {
 export const showByAccess = (access, canViewAccess) => {
   return hasOneOf(canViewAccess, access)
 }
+
+export const setUserName = (username) => {
+  sessionStorage.setItem("username",username)
+}
+
+export const getUserName = () => sessionStorage.getItem('username')
