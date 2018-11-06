@@ -1,7 +1,8 @@
 import Axios from 'axios'
 import baseURL from '_conf/url'
 import { Message } from 'iview'
-import {getToken} from "./util";
+import {getToken,setToken} from "./util"
+import {refreshToken} from "@/api/login/login";
 
 class httpRequest {
   constructor () {
@@ -36,6 +37,7 @@ class httpRequest {
     // 添加响应拦截器
     instance.interceptors.response.use((res) => {
       let { data } = res
+      console.log(res)
       const is = this.destroy(url)
       if (!is) {
         setTimeout(() => {
@@ -43,10 +45,33 @@ class httpRequest {
         }, 500)
       }
       if (data.code !== 200) {
-        if (data.code === 403) {
-          Message.error('未登录，或登录失效，请登录')
-          window.location.href = '/login'
-          sessionStorage.clear()  //清除token避免路由跳转死循环
+          if (data.code === 403) {
+          // token 过期
+          if(data.msg === 'Token expire') {
+            //尝试刷新token
+            refreshToken(getToken()).then(res => {
+              if(res.code===200){
+                setToken(res.data)
+                Message.success('尝试刷新token成功，刷新页面...')
+                setInterval(() => {
+                  window.location.reload()
+                },1000)
+                // return data
+              }else {
+                Message.error('尝试刷新token失败,请重新登录')
+                setInterval(()=>{
+                  window.location.href = '/login'
+                  sessionStorage.clear()  //清除token避免路由跳转死循环
+                },2000)
+              }
+            }).catch(e =>{
+              Message.error('未登录，或登录失效，请登录')
+              setInterval(()=>{
+                window.location.href = '/login'
+                sessionStorage.clear()  //清除token避免路由跳转死循环
+              },2000)
+            })
+          }
         } else {
           if (data.msg) Message.error(data.msg)
         }
@@ -66,7 +91,8 @@ class httpRequest {
       // timeout: 2000,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-        'X-URL-PATH': location.pathname
+        'X-URL-PATH': location.pathname,
+        'crossDomain':true,
       }
     }
     return Axios.create(conf)
